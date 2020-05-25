@@ -34,7 +34,6 @@ for job in job_data:
     
 # Finding Job Link
 for job in job_data:
-    potential_title = job.find("h2", class_="title")
     potential_link = job.find_all("a", href=True)[0]
     if potential_link:
         link = "https://www.indeed.com" + potential_link["href"]
