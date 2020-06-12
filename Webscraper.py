@@ -16,7 +16,6 @@ ratings_list = []
 location_list = []
 job_summary = []
 url_list = []
-        
 
 # Finding job postings
 def job_title(job_soup_object):
@@ -119,4 +118,4 @@ def job_data_scrapper(page_list):
 dataframe = job_data_scrapper(page_list)
 
 # Clean the data frame
-clean_df_and_save(dataframe)    
+clean_df_and_save(dataframe)
