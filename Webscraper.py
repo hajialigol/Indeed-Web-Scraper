@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 
+# Arrays needed for webscraping
 page_list = ["https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&vjk=fb4fccb032904ab4",
              "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=10&vjk=af46ec7e37987830",
              "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=20&vjk=37f09b7cb7585a5e",
@@ -17,7 +18,7 @@ job_summary = []
 url_list = []
         
 
-# Finding Job Postings
+# Finding job postings
 def job_title(job_soup_object):
     for job in job_soup_object:
         potential_title = job.find("h2", class_="title")
@@ -28,8 +29,7 @@ def job_title(job_soup_object):
             title = "N/A"
         title_list.append(title)
     
-    
-# Finding Job Link
+# Finding job link
 def job_link(job_soup_object):
     for job in job_soup_object:
         potential_link = job.find_all("a", href=True)[0]
@@ -39,7 +39,7 @@ def job_link(job_soup_object):
         else:
             url_list.append("N/A")
         
-# Finding Company Name
+# Finding company name
 def job_company(job_soup_object):
     for job in job_soup_object:
         potential_company_tag = job.find("span", class_="company")
@@ -49,7 +49,7 @@ def job_company(job_soup_object):
             company = "N/A"
         company_list.append(company)
     
-# Find Job Locations
+# Find job locations
 def job_location(job_soup_object):
     for job in job_soup_object:
         potential_location = job.find("div", class_="recJobLoc")["data-rc-loc"]
@@ -59,7 +59,7 @@ def job_location(job_soup_object):
             location = "N/A"
         location_list.append(location)
     
-# Find Job Ratings
+# Find job ratings
 def job_rating(job_soup_object):
     for job in job_soup_object:
         potential_rating = job.find("span", class_="ratingsContent")
@@ -69,7 +69,7 @@ def job_rating(job_soup_object):
             rating = None
         ratings_list.append(rating)
     
-# Find Job Summaries
+# Find job summaries
 def job_summaries(job_soup_object):
     for job in job_soup_object:
         job_summary_placeholder = []
@@ -78,7 +78,7 @@ def job_summaries(job_soup_object):
             job_summary_placeholder.append(li.text)
         job_summary.append("".join(job_summary_placeholder))  
 
-# Create DataFrame
+# Create data frame
 def create_dataframe(title_list=title_list, company_list=company_list,
                     job_summary=job_summary, ratings_list=ratings_list,
                     location_list=location_list, url_list=url_list):
@@ -88,13 +88,13 @@ def create_dataframe(title_list=title_list, company_list=company_list,
                               'Location' : location_list, 'URL' : url_list}) 
     return df
 
-# Create and Save DataFrame
+# Create and save data frame
 def clean_df_and_save(dataframe):
     df = dataframe.drop_duplicates(subset = ["Job Title", "Company", "Rating", "Location"],
                                     keep='first')
     df.to_excel("Job_Postings.xlsx")
     
-
+# This method returns a data frame of all pages from a list of pages
 def job_data_scrapper(page_list):
     for url in page_list:
         title_list = []
@@ -115,5 +115,8 @@ def job_data_scrapper(page_list):
         dataframe = create_dataframe()
     return dataframe
 
+# Create data frame from list of pages 
 dataframe = job_data_scrapper(page_list)
+
+# Clean the data frame
 clean_df_and_save(dataframe)    
