@@ -3,7 +3,8 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 
-# Arrays needed for webscraping
+
+# List of urls to extract data science positions froms
 page_list = ["https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&vjk=fb4fccb032904ab4",
              "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=10&vjk=af46ec7e37987830",
              "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=20&vjk=37f09b7cb7585a5e",
@@ -16,9 +17,16 @@ ratings_list = []
 location_list = []
 job_summary = []
 url_list = []
+        
 
-# Finding job postings
+
 def job_title(job_soup_object):
+    '''
+    Desc:
+        Given a BeautifulSoup object, this method webscrapes job titles and adds the information to a list of titles.
+    Inpt:
+        job_soup_object [BeautifulSoup]: BeautifulSoup object that has access to information about job postings.
+    '''
     for job in job_soup_object:
         potential_title = job.find("h2", class_="title")
         potential_link = potential_title.href
@@ -28,8 +36,15 @@ def job_title(job_soup_object):
             title = "N/A"
         title_list.append(title)
     
-# Finding job link
+    
+
 def job_link(job_soup_object):
+    '''
+    Desc:
+        This method finds the urls of job openings and appends it to a list of urls.
+    Inpt:
+        job_soup_object [BeautifulSoup]: BeautifulSoup object that has access to information about job postings.
+    '''
     for job in job_soup_object:
         potential_link = job.find_all("a", href=True)[0]
         if potential_link:
@@ -37,9 +52,17 @@ def job_link(job_soup_object):
             url_list.append(link)
         else:
             url_list.append("N/A")
+
+
         
-# Finding company name
 def job_company(job_soup_object):
+    '''
+    Desc:
+        Given a BeautifulSoup object, this method extracts the company name. Afterwards, the information is appended
+        to a list repesenting company names.
+    Inpt:
+        job_soup_object [BeautifulSoup]: BeautifulSoup object that has access to information about job postings
+    '''
     for job in job_soup_object:
         potential_company_tag = job.find("span", class_="company")
         if potential_company_tag:
@@ -48,8 +71,15 @@ def job_company(job_soup_object):
             company = "N/A"
         company_list.append(company)
     
-# Find job locations
+
+
 def job_location(job_soup_object):
+    '''
+    Desc:
+        job_location() appends the location of a list of jobs to a list of locations
+    Inpt:
+        job_soup_object [BeautifulSoup]: BeautifulSoup object that has access to information about job postings.
+    '''
     for job in job_soup_object:
         potential_location = job.find("div", class_="recJobLoc")["data-rc-loc"]
         if potential_location:
@@ -58,8 +88,15 @@ def job_location(job_soup_object):
             location = "N/A"
         location_list.append(location)
     
-# Find job ratings
+
+
 def job_rating(job_soup_object):
+    '''
+    Desc:
+        Most of the times, there are ratings for jobs. This method extracts those ratings and appends them to a list.
+    Inpt:
+        job_soup_object [BeautifulSoup]: BeautifulSoup object that has access to information about job postings.
+    '''
     for job in job_soup_object:
         potential_rating = job.find("span", class_="ratingsContent")
         if potential_rating:
@@ -67,9 +104,16 @@ def job_rating(job_soup_object):
         else:
             rating = None
         ratings_list.append(rating)
+
+
     
-# Find job summaries
 def job_summaries(job_soup_object):
+    '''
+    Desc:
+        job_summaries() webscrapes the description of each job, adding it to a list.
+    Inpt:
+        job_soup_object [BeautifulSoup]: BeautifulSoup object that has access to information about job postings.
+    '''
     for job in job_soup_object:
         job_summary_placeholder = []
         li_list = job.find_all("li")
@@ -77,24 +121,58 @@ def job_summaries(job_soup_object):
             job_summary_placeholder.append(li.text)
         job_summary.append("".join(job_summary_placeholder))  
 
-# Create data frame
+
+
 def create_dataframe(title_list=title_list, company_list=company_list,
                     job_summary=job_summary, ratings_list=ratings_list,
                     location_list=location_list, url_list=url_list):
+    '''
+    Desc:
+        This method creates a dataframe given job information.
+    Inpt:
+        title_list [list]: List of job titles.
+        company_list [list]: List of companies of each job.
+        job_summary [list]: List of job descriptions.
+        ratings_list [list]: List of each job's rating.
+        location_list [list]: List of job locations.
+        url_list [list]: List of each job's url.
+    Oupt:
+        A dataframe that contains information about job postings. The information is determined
+        by the input lists.
+
+    '''
     
     df = pd.DataFrame({'Job Title' : title_list, 'Company' : company_list, 
                               'Summary' : job_summary, 'Rating' : ratings_list,
                               'Location' : location_list, 'URL' : url_list}) 
     return df
 
-# Create and save data frame
-def clean_df_and_save(dataframe):
+
+
+def clean_df_and_save(dataframe, save):
+    '''
+    Desc:
+        This method cleans a given dataframe and saves it to the local directory.
+    Inpt:
+        dataframe [df]: Dataframe to clean and save.
+        save [str]: String dictating if to save the dataframe. To save the dataframe, set 'save = yes'.
+    '''
     df = dataframe.drop_duplicates(subset = ["Job Title", "Company", "Rating", "Location"],
                                     keep='first')
-    df.to_excel("Job_Postings.xlsx")
+    if tolower(save) == 'yes':
+        df.to_excel("Job_Postings.xlsx")
     
-# This method returns a data frame of all pages from a list of pages
+
+
 def job_data_scrapper(page_list):
+    '''
+    Desc:
+        This method performs all operations starting from requesting the data to creating the dataframe.
+        It covers most of the functionality of the program.
+    Inpt:
+        page_list [list]: List of Indeed pages of job postings to webscrape from.
+
+    '''
     for url in page_list:
         title_list = []
         company_list = []
@@ -114,8 +192,8 @@ def job_data_scrapper(page_list):
         dataframe = create_dataframe()
     return dataframe
 
-# Create data frame from list of pages 
-dataframe = job_data_scrapper(page_list)
 
-# Clean the data frame
-clean_df_and_save(dataframe)
+
+if __name__ == '__main__':
+    dataframe = job_data_scrapper(page_list)
+    clean_df_and_save(dataframe)    
