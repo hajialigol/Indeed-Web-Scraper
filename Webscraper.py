@@ -5,12 +5,11 @@ from bs4 import BeautifulSoup
 
 
 # List of urls to extract data science positions froms
-page_list = ["https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&vjk=fb4fccb032904ab4",
-             "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=10&vjk=af46ec7e37987830",
-             "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=20&vjk=37f09b7cb7585a5e",
-             "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=30&vjk=ddeea8ed81dd7ece",
-             "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=40&vjk=4afb64094060284a",
-             "https://www.indeed.com/jobs?q=Data%20Science%20Intern&jt=internship&start=50&vjk=3cdcec6ed30005be"]
+page_list = ["https://www.indeed.com/jobs?q=data+analyst&l=McLean,+VA&radius=50&jt=fulltime&explvl=entry_level",
+             "https://www.indeed.com/jobs?q=data+analyst&l=McLean%2C+VA&radius=50&jt=fulltime&explvl=entry_level&start=10",
+             "https://www.indeed.com/jobs?q=data+analyst&l=McLean%2C+VA&radius=50&jt=fulltime&explvl=entry_level&start=20",
+             "https://www.indeed.com/jobs?q=data+analyst&l=McLean%2C+VA&radius=50&jt=fulltime&explvl=entry_level&start=30",
+             "https://www.indeed.com/jobs?q=data+analyst&l=McLean%2C+VA&radius=50&jt=fulltime&explvl=entry_level&start=40"]
 title_list = []
 company_list = []
 ratings_list = []
@@ -159,8 +158,8 @@ def clean_df_and_save(dataframe, save):
     '''
     df = dataframe.drop_duplicates(subset = ["Job Title", "Company", "Rating", "Location"],
                                     keep='first')
-    if tolower(save) == 'yes':
-        df.to_excel("Job_Postings.xlsx")
+    if save.lower() == 'yes':
+        df.to_excel("Data_Analyst_Postings.xlsx")
     
 
 
@@ -196,4 +195,4 @@ def job_data_scrapper(page_list):
 
 if __name__ == '__main__':
     dataframe = job_data_scrapper(page_list)
-    clean_df_and_save(dataframe)    
+    clean_df_and_save(dataframe, "yes")    
